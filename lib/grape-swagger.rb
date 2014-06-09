@@ -3,7 +3,7 @@ require 'kramdown'
 module Grape
   class API
     class << self
-      attr_reader :combined_routes
+      attr_reader :combined_routes, :combined_namespaces
 
       def add_swagger_documentation(options={})
         documentation_class = create_documentation_class
@@ -26,6 +26,14 @@ module Grape
             @combined_routes[resource] << route
           end
         end
+
+        @combined_namespaces = {}
+
+        endpoints.each do |endpoint|
+          ns = endpoint.settings.stack.last[:namespace]
+          @combined_namespaces[ns.space] = ns if ns
+        end
+
       end
 
       private
@@ -85,6 +93,7 @@ module Grape
               header['Access-Control-Request-Method'] = '*'
 
               routes = target_class::combined_routes
+              spaces = target_class::combined_namespaces
 
               if @@hide_documentation_path
                 routes.reject!{ |route, value| "/#{route}/".index(parse_path(@@mount_path, nil) << '/') == 0 }
@@ -95,9 +104,15 @@ module Grape
 
                 url_base    = parse_path(route.route_path.gsub('(.:format)', ''), route.route_version) if include_base_url
                 url_format  = '.{format}' unless @@hide_format
+
+                description = "Operations about #{local_route.pluralize}"
+                if spaces[local_route] && spaces[local_route].options[:desc]
+                  description = spaces[local_route].options[:desc]
+                end
+
                 {
                   :path => "/#{local_route}#{url_format}",
-                  :description => "Operations about #{local_route.pluralize}"
+                  :description => description
                 }
               end.compact
 
