@@ -240,7 +240,7 @@ module Grape
                                 end
                 description   = value.is_a?(Hash) ? value[:desc] || value[:description] : ''
                 required      = value.is_a?(Hash) ? !!value[:required] : false
-                defaultValue  = value.is_a?(Hash) ? value[:defaultValue] : nil
+                defaultValue  = value.is_a?(Hash) ? value[:default] : nil
                 is_array      = value.is_a?(Hash) ? (value[:is_array] || false) : false
                 if value.is_a?(Hash) && value.key?(:param_type)
                   paramType   = value[:param_type]
@@ -311,7 +311,7 @@ module Grape
                 dataType    = 'String'
                 description = value.is_a?(Hash) ? value[:description] : ''
                 required    = value.is_a?(Hash) ? !!value[:required] : false
-                defaultValue = value.is_a?(Hash) ? value[:defaultValue] : nil
+                defaultValue = value.is_a?(Hash) ? value[:default] : nil
                 paramType   = "header"
 
                 parsed_params = {
