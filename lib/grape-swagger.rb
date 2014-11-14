@@ -346,7 +346,9 @@ module Grape
             end
 
             def parse_entity_name(name)
-              entity_parts = name.to_s.split('::')
+              name = name.to_s
+              entity_parts = name.split('::')
+              return entity_parts.last.downcase if name =~ /^Virtus::Attribute::/
               entity_parts.reject! {|p| p == "Entity" || p == "Entities"}
               entity_parts.join("::")
             end
